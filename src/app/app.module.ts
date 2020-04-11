@@ -14,6 +14,7 @@ import { PastTrainingsComponent } from './training/past-trainings/past-trainings
 import { WelcomeComponent } from './welcome/welcome.component';
 import { AppRoutingModule } from './app-routing.module';
 import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 
 // noinspection AngularInvalidImportedOrDeclaredSymbol
 @NgModule({
@@ -33,7 +34,8 @@ import { FormsModule } from '@angular/forms';
     MaterialModule,
     AppRoutingModule,
     FlexLayoutModule,
-    FormsModule
+    FormsModule,
+    ReactiveFormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
