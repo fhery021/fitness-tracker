@@ -11,12 +11,12 @@ export class NewTrainingComponent implements OnInit {
 
   @Output() trainingStart = new EventEmitter<void>();
 
-  availableExercices: Exercise[] = [];
+  exercices: Exercise[] = [];
 
   constructor(private trainingService: TrainingService) { }
 
   ngOnInit(): void {
-    this.availableExercices = this.trainingService.availableExercises;
+    this.exercices = this.trainingService.getAvailableExercises();
   }
 
   onStartTraining() {
