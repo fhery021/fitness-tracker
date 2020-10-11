@@ -1,3 +1,4 @@
+import { environment } from './../environments/environment';
 import { TrainingService } from './training/training.service';
 import { AuthService } from './auth/auth.service';
 import { MaterialModule } from './material.module';
@@ -20,6 +21,9 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { HeaderComponent } from './navigation/header/header.component';
 import { SidenavListComponent } from './navigation/sidenav-list/sidenav-list.component';
 import { StopTrainingComponent } from './training/current-training/stop-training.component';
+import { AngularFireModule } from 'angularfire2';
+import { AngularFirestoreModule } from 'angularfire2/firestore';
+
 
 // noinspection AngularInvalidImportedOrDeclaredSymbol
 @NgModule({
@@ -43,7 +47,9 @@ import { StopTrainingComponent } from './training/current-training/stop-training
     AppRoutingModule,
     FlexLayoutModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    AngularFireModule.initializeApp(environment.firebase),
+    AngularFirestoreModule
   ],
   providers: [AuthService, TrainingService],
   bootstrap: [AppComponent],
