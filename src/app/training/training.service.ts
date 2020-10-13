@@ -10,6 +10,10 @@ export class TrainingService {
   exercisesChanged = new Subject<Exercise[]>();
   finishedExercisesChanged = new Subject<Exercise[]>();
 
+  private AVAILABLE_EXERCISES_PATH = 'availableExercises';
+  private FINISHED_EXERCISES_PATH = 'finishedExercises';
+
+
   private availableExercises: Exercise[] = [];
 
   private runningExercise: Exercise;
@@ -24,7 +28,7 @@ export class TrainingService {
 
   fetchAvailableExercises() {
     this.db
-      .collection('availableExercises')
+      .collection(this.AVAILABLE_EXERCISES_PATH)
       .snapshotChanges()
       .pipe(
         map(actions => actions.map(this.documentToDomainObject))
@@ -40,6 +44,9 @@ export class TrainingService {
   }
 
   startExercise(selectedId: string) {
+    // HOW-TO:  select a single document, then update it
+    // this.db.doc(this.AVAILABLE_EXERCISES_PATH + '/' + selectedId).update({ lastSelected: new Date() });
+
     this.runningExercise = this.availableExercises.find(ex => ex.id === selectedId);
     this.exerciseChanged.next({ ...this.runningExercise });
   }
@@ -71,7 +78,7 @@ export class TrainingService {
   }
 
   fetchCompletedOrCancelledExercises() {
-    this.db.collection('finishedExercises')
+    this.db.collection(this.FINISHED_EXERCISES_PATH)
       .valueChanges()
       .subscribe({
         next: (exercises: Exercise[]) => this.finishedExercisesChanged.next(exercises)
@@ -79,6 +86,6 @@ export class TrainingService {
   }
 
   private addDataToDatabase(exercise: Exercise) {
-    this.db.collection('finishedExercises').add(exercise);
+    this.db.collection(this.FINISHED_EXERCISES_PATH).add(exercise);
   }
 }
