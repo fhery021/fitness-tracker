@@ -1,3 +1,4 @@
+import { UIService } from './../shared/ui.service';
 import { Subscription } from 'rxjs/Subscription';
 import { AngularFirestore } from 'angularfire2/firestore';
 import { Injectable } from '@angular/core';
@@ -19,7 +20,10 @@ export class TrainingService {
 
   private firebaseSubscriptions: Subscription[] = [];
 
-  constructor(private db: AngularFirestore) { }
+  constructor(
+    private db: AngularFirestore,
+    private uiService: UIService
+  ) { }
 
   private documentToDomainObject = _ => {
     const object = _.payload.doc.data();
@@ -28,6 +32,7 @@ export class TrainingService {
   }
 
   fetchAvailableExercises() {
+    this.uiService.loadingStateChanged.next(true);
     this.firebaseSubscriptions.push(
       this.db
         .collection(this.AVAILABLE_EXERCISES_PATH)
@@ -38,9 +43,10 @@ export class TrainingService {
           next: (exercises: Exercise[]) => {
             this.availableExercises = exercises;
             this.exercisesChanged.next(this.availableExercises.slice());
+            this.uiService.loadingStateChanged.next(false);
           },
           error: (err: any) => {
-           // console.error(err);
+            this.uiService.loadingStateChanged.next(false);
           }
         })
     );
@@ -83,14 +89,16 @@ export class TrainingService {
   }
 
   fetchCompletedOrCancelledExercises() {
+    this.uiService.loadingStateChanged.next(true);
     this.firebaseSubscriptions.push(
       this.db.collection(this.FINISHED_EXERCISES_PATH)
         .valueChanges()
         .subscribe({
-          next: (exercises: Exercise[]) => this.finishedExercisesChanged.next(exercises),
-          error: (error: any) => {
-            // console.error(error);
-          }
+          next: (exercises: Exercise[]) => {
+            this.finishedExercisesChanged.next(exercises);
+            this.uiService.loadingStateChanged.next(false);
+          },
+          error: _ => this.uiService.loadingStateChanged.next(false)
         })
     );
   }

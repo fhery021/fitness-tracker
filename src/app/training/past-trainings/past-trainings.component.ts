@@ -1,3 +1,4 @@
+import { UIService } from './../../shared/ui.service';
 import { Subscription } from 'rxjs/Subscription';
 import { TrainingService } from './../training.service';
 import { Exercise } from './../exercise.model';
@@ -17,12 +18,19 @@ export class PastTrainingsComponent implements OnInit, AfterViewInit, OnDestroy 
   dataSource = new MatTableDataSource<Exercise>();
   private exerciseChangedSubsription: Subscription;
 
+  isLoading = true;
+  private loadingSubscription: Subscription;
+
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
-  constructor(private trainingService: TrainingService) { }
+  constructor(
+    private trainingService: TrainingService,
+    private uiService: UIService
+  ) { }
 
   ngOnInit(): void {
+    this.loadingSubscription = this.uiService.loadingStateChanged.subscribe(isLoading => this.isLoading = isLoading);
     this.exerciseChangedSubsription = this.trainingService
       .finishedExercisesChanged
       .subscribe({
@@ -42,5 +50,6 @@ export class PastTrainingsComponent implements OnInit, AfterViewInit, OnDestroy 
 
   ngOnDestroy(): void {
     this.exerciseChangedSubsription.unsubscribe();
+    this.loadingSubscription.unsubscribe();
   }
 }
