@@ -47,6 +47,9 @@ export class TrainingService {
           },
           error: (err: any) => {
             this.uiService.loadingStateChanged.next(false);
+            console.error(err);
+            this.uiService.showSnackBar('Fetching Exercises failed, please try again later', null, 3000);
+            this.exercisesChanged.next(null);
           }
         })
     );
@@ -98,7 +101,12 @@ export class TrainingService {
             this.finishedExercisesChanged.next(exercises);
             this.uiService.loadingStateChanged.next(false);
           },
-          error: _ => this.uiService.loadingStateChanged.next(false)
+          error: (err: any) => {
+            this.uiService.loadingStateChanged.next(false);
+            console.error(err);
+            this.uiService.showSnackBar('Fetching Completed Exercises failed, please try again later', null, 3000);
+            // this.finishedExercisesChanged.next(null);
+          }
         })
     );
   }
