@@ -1,3 +1,4 @@
+import { Subscription } from 'rxjs/Subscription';
 import { AngularFirestore } from 'angularfire2/firestore';
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
@@ -13,32 +14,36 @@ export class TrainingService {
   private AVAILABLE_EXERCISES_PATH = 'availableExercises';
   private FINISHED_EXERCISES_PATH = 'finishedExercises';
 
-
   private availableExercises: Exercise[] = [];
-
   private runningExercise: Exercise;
+
+  private firebaseSubscriptions: Subscription[] = [];
 
   constructor(private db: AngularFirestore) { }
 
-  documentToDomainObject = _ => {
+  private documentToDomainObject = _ => {
     const object = _.payload.doc.data();
     object.id = _.payload.doc.id;
     return object;
   }
 
   fetchAvailableExercises() {
-    this.db
-      .collection(this.AVAILABLE_EXERCISES_PATH)
-      .snapshotChanges()
-      .pipe(
-        map(actions => actions.map(this.documentToDomainObject))
-      ).subscribe({
-        next: (exercises: Exercise[]) => {
-          this.availableExercises = exercises;
-          this.exercisesChanged.next(this.availableExercises.slice());
-        },
-        error: (err: any) => console.log(err)
-      });
+    this.firebaseSubscriptions.push(
+      this.db
+        .collection(this.AVAILABLE_EXERCISES_PATH)
+        .snapshotChanges()
+        .pipe(
+          map(actions => actions.map(this.documentToDomainObject))
+        ).subscribe({
+          next: (exercises: Exercise[]) => {
+            this.availableExercises = exercises;
+            this.exercisesChanged.next(this.availableExercises.slice());
+          },
+          error: (err: any) => {
+           // console.error(err);
+          }
+        })
+    );
 
     return this.availableExercises.slice();
   }
@@ -78,14 +83,23 @@ export class TrainingService {
   }
 
   fetchCompletedOrCancelledExercises() {
-    this.db.collection(this.FINISHED_EXERCISES_PATH)
-      .valueChanges()
-      .subscribe({
-        next: (exercises: Exercise[]) => this.finishedExercisesChanged.next(exercises)
-      });
+    this.firebaseSubscriptions.push(
+      this.db.collection(this.FINISHED_EXERCISES_PATH)
+        .valueChanges()
+        .subscribe({
+          next: (exercises: Exercise[]) => this.finishedExercisesChanged.next(exercises),
+          error: (error: any) => {
+            // console.error(error);
+          }
+        })
+    );
   }
 
   private addDataToDatabase(exercise: Exercise) {
     this.db.collection(this.FINISHED_EXERCISES_PATH).add(exercise);
+  }
+
+  cancelSubscriptions() {
+    this.firebaseSubscriptions.forEach(sub => sub.unsubscribe);
   }
 }
