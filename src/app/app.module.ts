@@ -16,6 +16,8 @@ import { AppRoutingModule } from './app-routing.module';
 import { HeaderComponent } from './navigation/header/header.component';
 import { SidenavListComponent } from './navigation/sidenav-list/sidenav-list.component';
 import { AngularFireModule } from 'angularfire2';
+import { StoreModule } from '@ngrx/store';
+import { reducers } from './app.reducer';
 
 
 // noinspection AngularInvalidImportedOrDeclaredSymbol
@@ -34,7 +36,8 @@ import { AngularFireModule } from 'angularfire2';
     FlexLayoutModule,
     AngularFireModule.initializeApp(environment.firebase),
     AuthModule,
-    AngularFirestoreModule
+    AngularFirestoreModule,
+    StoreModule.forRoot(reducers)
   ],
   providers: [AuthService, TrainingService, UIService],
   bootstrap: [AppComponent]
