@@ -1,4 +1,3 @@
-import { UIService } from './../../shared/ui.service';
 import { Subscription } from 'rxjs/Subscription';
 import { TrainingService } from './../training.service';
 import { Exercise } from './../exercise.model';
@@ -6,6 +5,9 @@ import { AfterViewInit, Component, OnInit, ViewChild, OnDestroy } from '@angular
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
+import { Observable } from 'rxjs';
+import { Store } from '@ngrx/store';
+import * as fromRoot from '../../app.reducer';
 
 @Component({
   selector: 'app-past-trainings',
@@ -18,19 +20,18 @@ export class PastTrainingsComponent implements OnInit, AfterViewInit, OnDestroy 
   dataSource = new MatTableDataSource<Exercise>();
   private exerciseChangedSubsription: Subscription;
 
-  isLoading = true;
-  private loadingSubscription: Subscription;
+  isLoading$: Observable<boolean>;
 
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
   constructor(
     private trainingService: TrainingService,
-    private uiService: UIService
+    private store: Store<fromRoot.State>
   ) { }
 
   ngOnInit(): void {
-    this.loadingSubscription = this.uiService.loadingStateChanged.subscribe(isLoading => this.isLoading = isLoading);
+    this.isLoading$ = this.store.select(fromRoot.getIsLoading);
     this.exerciseChangedSubsription = this.trainingService
       .finishedExercisesChanged
       .subscribe({
@@ -51,9 +52,6 @@ export class PastTrainingsComponent implements OnInit, AfterViewInit, OnDestroy 
   ngOnDestroy(): void {
     if (this.exerciseChangedSubsription) {
       this.exerciseChangedSubsription.unsubscribe();
-    }
-    if (this.loadingSubscription) {
-      this.loadingSubscription.unsubscribe();
     }
   }
 }

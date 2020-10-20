@@ -19,7 +19,7 @@ export class AuthService {
     private angularFireAuth: AngularFireAuth,
     private trainingService: TrainingService,
     private uiService: UIService,
-    private store: Store<{ ui: fromRoot.State }>
+    private store: Store<fromRoot.State>
   ) { }
 
   initAuthListener() {
@@ -44,7 +44,7 @@ export class AuthService {
       authData.email,
       authData.password
     )
-      .then(_ => this.store.dispatch({ type: 'STOP_LOADING' }))
+      .then(_ => this.store.dispatch(new UI.StopLoading()))
       .catch(error => {
         // this.uiService.loadingStateChanged.next(false);
         this.store.dispatch(new UI.StopLoading());
