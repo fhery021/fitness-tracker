@@ -37,9 +37,4 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  // ngOnDestroy(): void {
-  //   if (this.loadingSubscription) {
-  //     this.loadingSubscription.unsubscribe();
-  //   }
-  // }
 }
