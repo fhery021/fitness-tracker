@@ -22,6 +22,7 @@ export class PastTrainingsComponent implements OnInit, AfterViewInit {
 
   isLoading$: Observable<boolean>;
 
+
   @ViewChild(MatSort, {static: false}) set content(sort: MatSort){
     this.dataSource.sort = sort;
   }
